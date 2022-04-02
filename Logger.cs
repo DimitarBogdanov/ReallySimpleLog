@@ -10,7 +10,8 @@ public class Logger
     /// </summary>
     /// <param name="path">The file path for the log. Set to null for no file log.</param>
     /// <param name="outputToConsole">Set to true if you want the messages to be written to stdout.</param>
-    public Logger(string? path, bool outputToConsole)
+    /// <param name="previousLogPreserveMode">How should old logs be treated (see <see cref="PreviousLogPreserveMode"/> for more info)</param>
+    public Logger(string? path, bool outputToConsole, PreviousLogPreserveMode previousLogPreserveMode)
     {
         if (path == null && !outputToConsole)
         {
@@ -27,6 +28,26 @@ public class Logger
         if (path != null && !File.Exists(path))
         {
             File.Create(path, 0).Close();
+        }
+        else if (File.Exists(path))
+        {
+            switch (previousLogPreserveMode)
+            {
+                case PreviousLogPreserveMode.Override:
+                    File.WriteAllText(path, "");
+                    break;
+                
+                case PreviousLogPreserveMode.MoveToAnotherFile:
+                    File.WriteAllText($"{path}-PREVIOUS", File.ReadAllText(path));
+                    File.WriteAllText(path, "");
+                    break;
+                
+                case PreviousLogPreserveMode.Append:
+                    break;
+                
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(previousLogPreserveMode), previousLogPreserveMode, null);
+            }
         }
         
         _path = path;
@@ -111,9 +132,12 @@ public class Logger
         
         if (_outputToConsole)
         {
-            Console.ForegroundColor = color;
-            Console.WriteLine(OutputDatesInConsole ? datedMessage : message);
-            Console.ResetColor();
+            lock (Console.Out)
+            {
+                Console.ForegroundColor = color;
+                Console.WriteLine(OutputDatesInConsole ? datedMessage : message);
+                Console.ResetColor();
+            }
         }
         
         if (_path == null) return;

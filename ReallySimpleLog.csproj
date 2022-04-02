@@ -4,6 +4,17 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <Title>ReallySimpleLog</Title>
+        <Authors>Dimitar Bogdanov</Authors>
+        <Description>A really simple logger. Not made to be fast, but just to work.</Description>
+        <Copyright>Dimitar Bogdanov 2022</Copyright>
+        <PackageProjectUrl>https://github.com/DimitarBogdanov/ReallySimpleLog</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/DimitarBogdanov/ReallySimpleLog/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/DimitarBogdanov/ReallySimpleLog</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>logging logger really simple logger rsl reallysimple</PackageTags>
+        <PackageVersion>1.2.0</PackageVersion>
+        <PackageReleaseNotes>Added previousLogPreserveMode.</PackageReleaseNotes>
     </PropertyGroup>
 
 </Project>
