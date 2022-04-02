@@ -42,39 +42,70 @@ public class Logger
     /// <summary>
     /// Logs with an "INFO" tag in white.
     /// </summary>
-    public virtual void Info(params object[]? content) => Task.Run(() => Log("INFO", ConsoleColor.White, content));
+    public virtual void Info(params object[]? content) => Log("INFO", ConsoleColor.White, content);
+    
+    /// <summary>
+    /// Logs with an "INFO" tag in white.
+    /// </summary>
+    public virtual void Info(object? content) => Log("INFO", ConsoleColor.White, content);
     
     /// <summary>
     /// Logs with an "ERROR" tag in red.
     /// </summary>
-    public virtual void Error(params object[]? content) => Task.Run(() => Log("ERROR", ConsoleColor.Red, content));
+    public virtual void Error(params object[]? content) => Log("ERROR", ConsoleColor.Red, content);
+    
+    /// <summary>
+    /// Logs with an "ERROR" tag in red.
+    /// </summary>
+    public virtual void Error(object? content) => Log("ERROR", ConsoleColor.Red, content);
     
     /// <summary>
     /// Logs with a "WARN" tag in yellow.
     /// </summary>
-    public virtual void Warn(params object[]? content) => Task.Run(() => Log("WARN", ConsoleColor.Yellow, content));
+    public virtual void Warn(params object[]? content) => Log("WARN", ConsoleColor.Yellow, content);
+    
+    /// <summary>
+    /// Logs with a "WARN" tag in yellow.
+    /// </summary>
+    public virtual void Warn(object? content) => Log("WARN", ConsoleColor.Yellow, content);
     
     /// <summary>
     /// Logs with a "DEBUG" tag in green.
     /// </summary>
-    public virtual void Debug(params object[]? content) => Task.Run(() => Log("DEBUG", ConsoleColor.Green, content));
+    public virtual void Debug(params object[]? content) => Log("DEBUG", ConsoleColor.Green, content);
+    
+    /// <summary>
+    /// Logs with a "DEBUG" tag in green.
+    /// </summary>
+    public virtual void Debug(object? content) => Log("DEBUG", ConsoleColor.Green, content);
 
-    public void Exception(Exception ex) => Task.Run(() => Log(
+    public void Exception(Exception ex) => Log(
             $"Exception thrown in {ex.Source ?? "unknown"}",
             ConsoleColor.Red,
             $"{ex.Message}\n{ex.StackTrace}"
-            )
         );
 
     /// <summary>
     /// Internal logging method - the brains of the entire library.
+    /// This calls the other overload of Log (that takes in one object) with a string of the array elements separated by ", ".
     /// </summary>
     /// <param name="tag">The tag to put in square brackets.</param>
     /// <param name="color">The color to print the message in, if console printing is enabled.</param>
     /// <param name="content">What to write.</param>
     protected void Log(string tag, ConsoleColor color, params object[]? content)
     {
-        string message = content != null ? String.Join(", ", content) : "<null>";
+        Log(tag, color, content != null ? String.Join(", ", content) : null);
+    }
+    
+    /// <summary>
+    /// Internal logging method - the brains of the entire library.
+    /// </summary>
+    /// <param name="tag">The tag to put in square brackets.</param>
+    /// <param name="color">The color to print the message in, if console printing is enabled.</param>
+    /// <param name="content">What to write.</param>
+    protected void Log(string tag, ConsoleColor color, object? content)
+    {
+        string message = content?.ToString() ?? "<null>";
         message = $"[{tag}] {message}";
         string datedMessage = $"{DateTime.Now} {message}";
         
@@ -84,16 +115,20 @@ public class Logger
             Console.WriteLine(OutputDatesInConsole ? datedMessage : message);
             Console.ResetColor();
         }
-
+        
         if (_path == null) return;
-        try
+
+        lock (_path)
         {
-            File.AppendAllLines(_path, new[] {OutputDatesInFile ? datedMessage : message});
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"SimpleLog :: failed to write to file: {ex.Message}");
-            throw;
+            try
+            {
+                File.AppendAllLines(_path, new[] {OutputDatesInFile ? datedMessage : message});
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"SimpleLog :: failed to write to file: {ex.Message}");
+                throw;
+            }
         }
     }
 }
