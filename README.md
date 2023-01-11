@@ -1,4 +1,9 @@
-# ReallySimpleLog
+# Please don't use this - it's terrible! I recommend [Serilog](https://github.com/serilog/serilog)
+
+
+---
+
+## ReallySimpleLog
 
 ReallySimpleLog is a 10-minute logging library.
 
